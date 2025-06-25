@@ -96,7 +96,7 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
 
     if (response.ok) {
         cart = {};                  // ✅ 先清空購物車
-        renderCart();               // ✅ 更新畫面
+        updateCart();               // ✅ 更新畫面
         form.reset();               // ✅ 最後清空表單
         document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
     } else {
