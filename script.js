@@ -1,4 +1,3 @@
-
 const menuData = {
     "🍝 麵食類": ["山羊起司雙茄義大利麵", "義式肉醬麵", "かがり雞白湯叉燒拉麵", "日清拉麵", "營多撈麵"],
     "🍗 雞肉料理": ["香煎雞腿排", "照燒雞腿排", "清炒櫛瓜雞胸肉", "椒鹽雞胸肉", "台式鹽酥雞佐羅勒", "鄉村蔬菜雞腿咖哩飯（可加蛋包）", "水煮雞胸肉"],
@@ -19,12 +18,14 @@ function renderMenu() {
         div.className = 'menu-category';
         div.innerHTML = `<h3>${category}</h3>`;
         menuData[category].forEach(item => {
+            // 轉義單引號以避免 onclick 問題
+            const escapedItem = item.replace(/'/g, "\\'");
             div.innerHTML += `
                 <div class="menu-item">
                     ${item}
-                    <button onclick="addToCart('${item}')">＋</button>
+                    <button onclick="addToCart('${escapedItem}')">＋</button>
                     <span id="qty-${item}">0</span>
-                    <button onclick="removeFromCart('${item}')">－</button>
+                    <button onclick="removeFromCart('${escapedItem}')">－</button>
                 </div>
             `;
         });
@@ -50,7 +51,11 @@ function updateCart() {
     ul.innerHTML = '';
     for (const item in cart) {
         ul.innerHTML += `<li>${item} x ${cart[item]}</li>`;
-        document.getElementById(`qty-${item}`).innerText = cart[item];
+        // 添加安全檢查
+        const qtyElement = document.getElementById(`qty-${item}`);
+        if (qtyElement) {
+            qtyElement.innerText = cart[item];
+        }
     }
 }
 
@@ -59,7 +64,6 @@ function submitOrder() {
 }
 
 window.onload = renderMenu;
-
 
 function prepareOrder() {
     const textarea = document.getElementById("orderText");
@@ -71,6 +75,7 @@ function prepareOrder() {
     textarea.value = orderLines.join("\n");
     return true;
 }
+
 document.getElementById("orderForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -84,27 +89,32 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
     submitBtn.textContent = "送出中...";
     submitBtn.disabled = true;
 
-   try {
-    const response = await fetch("https://formspree.io/f/xkgbpoyq", {
-        method: "POST",
-        mode: "cors",
-        body: formData,
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
+    try {
+        const response = await fetch("https://formspree.io/f/xkgbpoyq", {
+            method: "POST",
+            mode: "cors",
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-    if (response.ok) {
-        cart = {};                  // ✅ 先清空購物車
-        updateCart();               // ✅ 更新畫面
-        form.reset();               // ✅ 最後清空表單
-        document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
-    } else {
-        document.getElementById("statusMsg").textContent = "❌ 發送失敗，請稍後再試";
+        if (response.ok) {
+            cart = {};                  // ✅ 先清空購物車
+            updateCart();               // ✅ 更新畫面
+            form.reset();               // ✅ 最後清空表單
+            document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
+            // 3秒後清除狀態訊息
+            setTimeout(() => {
+                document.getElementById("statusMsg").textContent = "";
+            }, 3000);
+        } else {
+            document.getElementById("statusMsg").textContent = "❌ 發送失敗，請稍後再試";
+        }
+    } catch (error) {
+        document.getElementById("statusMsg").textContent = "⚠️ 發生錯誤：" + error.message;
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
-} catch (error) {
-    document.getElementById("statusMsg").textContent = "⚠️ 發生錯誤：" + error.message;
-} finally {
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
-}
+}); // 
