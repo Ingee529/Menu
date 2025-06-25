@@ -17,14 +17,13 @@
             <ul id="cart"></ul>
         </div>
         <div class="submit-section">
-         <form action="https://formsubmit.co/2d8560d30738174bab6c08b9ce1aea8a" 
-      method="POST" 
-      onsubmit="return prepareOrder()" 
-                <input type="hidden" name="_subject" value="咖波村廚房有新任務">
-                <textarea name="order" id="orderText" style="display:none;"></textarea>
-                <button type="submit">送出訂單</button>
-            </form>
-        </div>
+    <form id="orderForm">
+        <input type="hidden" name="_subject" value="咖波村廚房有新任務">
+        <textarea name="order" id="orderText" style="display:none;"></textarea>
+        <button type="submit">送出訂單</button>
+    </form>
+    <p id="statusMsg" style="color: green; font-weight: bold;"></p>
+</div>
     </div>
     <script src="script.js"></script>
 </body>
