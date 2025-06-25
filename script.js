@@ -84,27 +84,27 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
     submitBtn.textContent = "送出中...";
     submitBtn.disabled = true;
 
-    try {
-        const response = await fetch("https://formspree.io/f/xkgbpoyq", {
-            method: "POST",
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
-            form.reset();
-            cart = {};
-            renderCart();
-        } else {
-            document.getElementById("statusMsg").textContent = "❌ 發送失敗，請稍後再試";
+   try {
+    const response = await fetch("https://formspree.io/f/xkgbpoyq", {
+        method: "POST",
+        mode: "cors",
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
         }
-    } catch (error) {
-        document.getElementById("statusMsg").textContent = "⚠️ 發生錯誤：" + error.message;
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+    });
+
+    if (response.ok) {
+        cart = {};                  // ✅ 先清空購物車
+        renderCart();               // ✅ 更新畫面
+        form.reset();               // ✅ 最後清空表單
+        document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
+    } else {
+        document.getElementById("statusMsg").textContent = "❌ 發送失敗，請稍後再試";
     }
-});
+} catch (error) {
+    document.getElementById("statusMsg").textContent = "⚠️ 發生錯誤：" + error.message;
+} finally {
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+}
