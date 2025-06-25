@@ -71,3 +71,42 @@ function prepareOrder() {
     textarea.value = orderLines.join("\n");
     return true;
 }
+// 表單送出攔截與送出流程
+document.getElementById("orderForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // 阻止表單預設送出
+
+    if (!prepareOrder()) return;
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // 顯示送出中的提示
+    const submitBtn = form.querySelector("button[type=submit]");
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "送出中...";
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch("https://formsubmit.co/ajax/2d8560d30738174bab6c08b9ce1aea8a", {
+            method: "POST",
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            document.getElementById("statusMsg").textContent = "✅ 訂單已成功送出！";
+            form.reset(); // 清空表單
+            cart = {};    // 清空購物車
+            renderCart(); // 更新畫面
+        } else {
+            document.getElementById("statusMsg").textContent = "❌ 訂單送出失敗，請稍後再試";
+        }
+    } catch (error) {
+        document.getElementById("statusMsg").textContent = "⚠️ 發生錯誤：" + error.message;
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
