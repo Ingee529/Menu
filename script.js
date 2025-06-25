@@ -10,7 +10,7 @@ const menuData = {
     "🧋 飲品類": ["冰／熱拿鐵", "手沖咖啡（淺／中／深焙）", "麥茶", "香蕉牛奶", "蘋果牛奶", "酪梨牛奶", "藍莓牛奶"]
 };
 
-const cart = {};
+let cart = {};
 
 function renderMenu() {
     const menu = document.getElementById('menu');
